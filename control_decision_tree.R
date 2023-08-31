@@ -1,8 +1,8 @@
 
 library(tidyverse)
-#upload NCTB  (Last downloaded aug 14  2023) #make sure its raw vars
+#upload NCTB  (Last downloaded aug 24 2023) #make sure its raw vars
 raw_NCTB_TB_test_vars <- read.csv(
-  "/Users/oshi/Downloads/NorthernCapeTBCaseCo-TBtestvariables_DATA_2023-08-24_2146.csv",
+  "/Users/oshi/Downloads/NorthernCapeTBCaseCo-TBtestvariables_DATA_2023-08-31_0747.csv",
   sep = ";",
   header = TRUE,
   na.strings = c("", " ", "NA", "N/A"),

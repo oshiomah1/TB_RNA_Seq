@@ -10,11 +10,10 @@ source("/Users/oshi/Desktop/TB/control_decision_tree.R")
 
 #make a vector of column names to rename NCTB columns downstream
 NCTB_new_name <- c(NCTB_Age = "Age.", NCTB_Saliva = "Saliva.Kit.Barcode.Number", NCTB_Gender = "Gender", NCTB_Recruitment_date = "Date.of.Recruitment")
-#/Users/oshi/Downloads/NorthernCapeTBCaseCo-Thinned_DATA_LABELS_2023-08-14_2223.csv
 
-#upload NCTB  #  (Last downloaded aug 14         
+#upload NCTB thinned from Redcap (datalabels) #  (Last downloaded aug 31         
 raw_NCTB_data <- read.csv(
-  "/Users/oshi/Downloads/NorthernCapeTBCaseCo-Thinned_DATA_LABELS_2023-08-25_0115.csv",
+  "/Users/oshi/Downloads/NorthernCapeTBCaseCo-Thinned_DATA_LABELS_2023-08-31_0738.csv",
   sep = ";",
   header = TRUE,
   na.strings = c("", " ", "NA", "N/A"),
@@ -22,11 +21,11 @@ raw_NCTB_data <- read.csv(
 ) %>%
   unite("NCTB.Name", Surname, First.Name, sep = " ", remove = FALSE, na.rm = TRUE) %>% rename(all_of(NCTB_new_name)) 
 
-
 NCR_new_name <- c(Surname = "Participant.Surname", First.Name = "Participant.first.name", NCR_Age = "Age.of.participant", NCR_Gender = "Sex..gender..of.participant.", NCR_Phleb_date ="Date.and.Time.of.Phlebotomy", NCR_Saliva = "Participant.study.saliva.ID", current_other_inf ="Do.you.currently.have.an.infection.such.as.a.cold.or.the.flu.....not.TB.", tb_status = "Do.you.currently.have.TB........" )
 
+#upload Thin Report from NCR dataset in redcap, Aug 30
 raw_NCR_data <- read.csv(
-  "/Users/oshi/Downloads/InvestigationOfAnces-ThinReport_DATA_LABELS_2023-08-25_0120.csv",
+  "/Users/oshi/Downloads/InvestigationOfAnces-ThinReport_DATA_LABELS_2023-08-31_0744.csv",
   header = TRUE,
   sep = ";",
   na.strings = c("", " ", "NA", "N/A"),
@@ -196,7 +195,6 @@ final_control_assignments <- Prelim_Merged_Dataset_beta %>%
   filter(!Record.ID %in% IDs_to_remove) %>% 
   filter(!Participant.study.ID %in% NCR_to_remove) %>% distinct(.keep_all = TRUE) %>% mutate(validated_control_status = case_when(TB_diagnosis=="control" & current_other_inf == "Yes" ~ "ctrl_flu", TB_diagnosis == "control"& current_other_inf == "No" ~ "ctrl", TB_diagnosis =="control" & is.na(current_other_inf) ~ "ctrl_unkwn_flu", tb_status == "No" & TB_diagnosis =="case" ~ "notctrl_other" ,tb_status == "Yes" & TB_diagnosis =="case" ~ NA ,is.na(tb_status) & TB_diagnosis =="case" ~ NA ,TRUE ~ TB_diagnosis)) %>% relocate(validated_control_status , .after = TB_diagnosis)%>% relocate("current_other_inf", .after = TB_diagnosis)
 
-#final case key sourced for insert script name here
 
 final_tb_status_table <- left_join(final_control_assignments, final_case_key, by = "Participant.study.ID") %>% relocate("validated_case_status", .after = "validated_control_status") %>% mutate(FINAL_STATUS = case_when(is.na(validated_case_status) & is.na(validated_control_status) ~ "missing",is.na(validated_case_status) & !is.na(validated_control_status) ~ validated_control_status,!is.na(validated_case_status) & is.na(validated_control_status) ~ validated_case_status )) %>% relocate("FINAL_STATUS", .after = "validated_case_status")
 #include cases with flu
@@ -212,7 +210,22 @@ view(final_counts2)
 
 output_path <- "/Users/oshi/Library/CloudStorage/Dropbox/NCR Study"
 
-write.csv(final_tb_status_table2 , file.path(output_path, "final__tb_assignments.csv"), row.names = FALSE)
+#write.csv(final_tb_status_table2 , file.path(output_path, "final__tb_assignments.csv"), row.names = FALSE)
+
+
+# Generate a timestamp for the file name
+timestamp <- format(Sys.time(), "%Y-%m-%d_%H-%M")
+
+# Specify the output file name with the timestamp
+output_file <- paste0("final_tb_assignments_", timestamp, ".csv")
+
+# Write the data to a timestamped CSV file
+write.csv(final_tb_status_table2, file.path(output_path, output_file), row.names = FALSE)
+
+
+
+
+
 
 missing_participant_ids <- final_tb_status_table2 %>%
   filter(FINAL_STATUS == "missing") %>%

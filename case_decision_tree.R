@@ -3,11 +3,9 @@ library(tidyverse)
 #vector to rename columns later
 NCR_new_name <- c(Surname = "Participant.Surname", First.Name = "Participant.first.name", NCR_Age = "Age.of.participant", NCR_Gender = "Sex..gender..of.participant.", NCR_Phleb_date ="Date.and.Time.of.Phlebotomy", NCR_Saliva = "Participant.study.saliva.ID", current_other_inf ="Do.you.currently.have.an.infection.such.as.a.cold.or.the.flu.....not.TB.", tb_status = "Do.you.currently.have.TB........", lab_receive_date = "Date.PBMC.received.in.the.Lab", HIV_status="What.is.your.HIV.status." , treatment_srt_date =  "TB.treatment.start.date." , TB_Diag_Date ="Date.of.TB.diagnosis.")
 
-#read in data
-#/Users/oshi/Downloads/InvestigationOfAnces-ThinReport_DATA_LABELS_2023-08-23_2240.csv
-
+#read in data (Thin report with data labels from Redcap)
 raw_NCR_data_ <- read.csv(
-  "/Users/oshi/Downloads/InvestigationOfAnces-ThinReport_DATA_LABELS_2023-08-25_0120.csv",
+  "/Users/oshi/Downloads/InvestigationOfAnces-ThinReport_DATA_LABELS_2023-08-31_0744.csv",
   header = TRUE,
   sep = ";",
   na.strings = c("", " ", "NA", "N/A"),
