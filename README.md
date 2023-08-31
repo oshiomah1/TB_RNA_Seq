@@ -22,7 +22,7 @@
 
 
 # Running Scripts:
-###There are 2 options to run the scripts
+### There are 2 options to run the scripts
 ### 1) Investigator mode: First you can run case_decision_tree and control_decision_tree in any order, then updated data merge. You would do this when trying to find cracks in the system
 
 ### 2) Quick'n'easy mode: Only Run updated_data_merge.R. This script actually automatically sources both decision tree scripts. You should get an output pop up on your rstudio with final case/control counts 
