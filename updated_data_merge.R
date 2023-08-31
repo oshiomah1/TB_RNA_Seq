@@ -1,4 +1,4 @@
-#combine both studiesg
+#combine both studies
 #manually install these packages if you don't have 'em'
 library(stringr)
 library(tidyverse)

@@ -1,7 +1,11 @@
-## TB_RNA_Seq
+# TB_RNA_Seq: Merging Datasets + Decision Trees
 
-#There are three R scripts in this project
-# case_decision_tree.R: Assigns individuals as cases or other based on initial self-report  and clinical syptoms and verified with current medical data
-# control_decision_tree.R :Assigns individuals as controls based onn PRIOR medical records. Searches a wide range of varaibles for TB evidienve in their lifetime
+## There are three R scripts in this project
 
-# updated_data_merge.R: It merges the smaller RNA seq study with the larger GWAS study using  fuzzy name matching, saliva barcodes and manu8al matching. It automatically calls case_decision_tree.R and control_decision_tree.R
+#### case_decision_tree.R: Assigns individuals as cases or other based on initial self-report and clinical syptoms and verified with current medical data
+
+#### control_decision_tree.R :Assigns individuals as controls based on PRIOR medical records. Searches a wide range of variables for TB evidence in their lifetime
+
+#### updated_data_merge.R: It merges the smaller RNA seq study with the larger GWAS study using fuzzy name matching, saliva barcodes and manual matching. It automatically calls case_decision_tree.R and control_decision_tree.R
+
+*#to do: make another script from updated data_merge to check for missing demographic data*
