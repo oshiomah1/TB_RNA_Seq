@@ -1,6 +1,6 @@
 
 library(tidyverse)
-#upload NCTB  (Last downloaded aug 24 2023) #make sure its raw vars
+#upload NCTB  (Last downloaded aug 31 2023) #make sure its raw vars
 raw_NCTB_TB_test_vars <- read.csv(
   "/Users/oshi/Downloads/NorthernCapeTBCaseCo-TBtestvariables_DATA_2023-08-31_0747.csv",
   sep = ";",
@@ -31,13 +31,9 @@ raw_study_data = as_tibble(raw_study_data)
 #################################################
 
 #I: RECODING TB NON SMEAR TO CASE AND CONTROLS FOR LATER USE##
-nonsmear_raw = raw_study_data %>%
-  select(record_id, tb_nonsmear_test_result) 
-
 nonsmear_table = raw_study_data %>%
   select(record_id, tb_nonsmear_test_result) %>%
   distinct(tb_nonsmear_test_result)
-
 
 # write_csv(nonsmear_table,"/Users/oshi/Desktop/TB/non_smear_raw2.csv") # remove before upload
 
@@ -103,7 +99,7 @@ table_A = left_join(table_0,treatment_or_drug2,by ="record_id")%>%
 
 # this is created using criteria outlined by the decision table A sketch in dropbox
 
-study_validator_A = function(tb_test_rest, tb_nonsmear, treat_or_drug) {
+medical_validator = function(tb_test_rest, tb_nonsmear, treat_or_drug) {
   case_when(
     tb_test_rest == 1 | (tb_test_rest != 1) & (tb_nonsmear == "case") | 
       (tb_test_rest != 1) & (tb_nonsmear != "case") & (treat_or_drug == "yes") ~ 'case',
@@ -123,8 +119,8 @@ study_validator_A = function(tb_test_rest, tb_nonsmear, treat_or_drug) {
 
 
 #and then  we pipe to select just record id and true_diag
-table_A_validated = table_A %>%
-  mutate(true_diag = study_validator_A(tb_test_rest, tb_nonsmear, treat_or_drug)) %>% select(record_id,true_diag)
+medical_validated = table_A %>%
+  mutate(true_diag = medical_validator(tb_test_rest, tb_nonsmear, treat_or_drug)) %>% select(record_id,true_diag)
 
 ######################################################
 ###PRELIMINARY DATA WRANGLING  FOR DECISION TREE B###
@@ -143,7 +139,7 @@ past_tb_table = raw_study_data %>%
 
 #see sketch in dropbox for explanation
 
-study_validator_B = function(prior_tb_self_reported, prior_tb_n_self_reported, frst_pst_tb_test_date) {
+self_report_validator = function(prior_tb_self_reported, prior_tb_n_self_reported, frst_pst_tb_test_date) {
   case_when(
     prior_tb_self_reported == 1 | 
       (prior_tb_self_reported != 1) & (prior_tb_n_self_reported != "unknown") | 
@@ -158,11 +154,11 @@ study_validator_B = function(prior_tb_self_reported, prior_tb_n_self_reported, f
 
 # run this function on the dataset
 #select relevant variables
-table_B_validated = past_tb_table %>%
-  mutate(true_diag_b = study_validator_B(prior_tb_self_reported, prior_tb_n_self_reported, frst_pst_tb_test_date)) %>% select(record_id,true_diag_b)
+self_report_validated = past_tb_table %>%
+  mutate(true_diag_b = self_report_validator(prior_tb_self_reported, prior_tb_n_self_reported, frst_pst_tb_test_date)) %>% select(record_id,true_diag_b)
 
 #create new dataframe that merges both true diag a and b
-merged_diagnoses = left_join(table_A_validated, table_B_validated , by = "record_id") 
+merged_diagnoses = left_join(medical_validated, self_report_validated , by = "record_id") 
 
 ##################################
 ###CREATE DECISION TREE TABLE C###

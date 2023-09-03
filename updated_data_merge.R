@@ -21,7 +21,7 @@ raw_NCTB_data <- read.csv(
 ) %>%
   unite("NCTB.Name", Surname, First.Name, sep = " ", remove = FALSE, na.rm = TRUE) %>% rename(all_of(NCTB_new_name)) 
 
-NCR_new_name <- c(Surname = "Participant.Surname", First.Name = "Participant.first.name", NCR_Age = "Age.of.participant", NCR_Gender = "Sex..gender..of.participant.", NCR_Phleb_date ="Date.and.Time.of.Phlebotomy", NCR_Saliva = "Participant.study.saliva.ID", current_other_inf ="Do.you.currently.have.an.infection.such.as.a.cold.or.the.flu.....not.TB.", tb_status = "Do.you.currently.have.TB........" )
+NCR_new_name <- c(Surname = "Participant.Surname", First.Name = "Participant.first.name", NCR_Age = "Age.of.participant", NCR_Gender = "Sex..gender..of.participant.", NCR_Phleb_date ="Date.and.Time.of.Phlebotomy", NCR_Saliva = "Participant.study.saliva.ID", NCR_current_other_inf ="Do.you.currently.have.an.infection.such.as.a.cold.or.the.flu.....not.TB.",  ncr_sr_tb_status = "Do.you.currently.have.TB........" )
 
 #upload Thin Report from NCR dataset in redcap, Aug 30
 raw_NCR_data <- read.csv(
@@ -35,7 +35,7 @@ raw_NCR_data <- read.csv(
   unite("NCR.Name", Surname, First.Name, sep = " ", remove = FALSE, na.rm = TRUE)  
 
 #Thin out NCR dataset to contain relevant columns, remove NCR093 because of missingness issues
-raw_NCR_data3 <- raw_NCR_data %>%  select(-contains(c("average","Have","Maternal","circum","pigment","you", "Complete","eight","Researcher","anguage","child", "Phone","Participant.s.S")))%>% select(contains(c("Participant","Full.Name", "Age","Sex","cell","Date", "NCR","pre_status", "IGRA", "tb_status", "current_other_inf")))%>%  filter(!(Participant.study.ID == "NCR093"))
+raw_NCR_data3 <- raw_NCR_data %>%  select(-contains(c("average","Have","Maternal","circum","pigment","you", "Complete","eight","Researcher","anguage","child", "Phone","Participant.s.S")))%>% select(contains(c("Participant","Full.Name", "Age","Sex","cell","Date", "NCR","pre_status", "IGRA", "tb_status", "NCR_current_other_inf")))%>%  filter(!(Participant.study.ID == "NCR093"))
 
 ########################################################################
 ################ Merge NCR and NCTB using Saliva Barcode ###############
@@ -162,7 +162,7 @@ print(values_not_in_cases)
 unmatched_NCRs <- raw_NCR_data3 %>%
   filter(Participant.study.ID %in% values_not_in_combined)
 
-# Print the unmatched_data dataframe
+# Print the unmatched_data frame
 print(unmatched_NCRs)
 
 #Now combine this individuals with missing demo data to main merged dataset
@@ -190,15 +190,15 @@ IDs_to_remove <- c(795,1446,383,569,678,917,1230)
 NCR_to_remove <- c("NCR017") 
 
 #from the dataframe Prelim_Merged_Dataset_beta2 , remove all rows where the Record.ID column matches one of the values in IDs_to_remove
-
+#ere artifically assigning NAs to situations that are cases (should be validated by case decision tree)
 final_control_assignments <- Prelim_Merged_Dataset_beta %>% 
   filter(!Record.ID %in% IDs_to_remove) %>% 
-  filter(!Participant.study.ID %in% NCR_to_remove) %>% distinct(.keep_all = TRUE) %>% mutate(validated_control_status = case_when(TB_diagnosis=="control" & current_other_inf == "Yes" ~ "ctrl_flu", TB_diagnosis == "control"& current_other_inf == "No" ~ "ctrl", TB_diagnosis =="control" & is.na(current_other_inf) ~ "ctrl_unkwn_flu", tb_status == "No" & TB_diagnosis =="case" ~ "notctrl_other" ,tb_status == "Yes" & TB_diagnosis =="case" ~ NA ,is.na(tb_status) & TB_diagnosis =="case" ~ NA ,TRUE ~ TB_diagnosis)) %>% relocate(validated_control_status , .after = TB_diagnosis)%>% relocate("current_other_inf", .after = TB_diagnosis)
+  filter(!Participant.study.ID %in% NCR_to_remove) %>% distinct(.keep_all = TRUE) %>% mutate(validated_control_status = case_when(TB_diagnosis=="control" & NCR_current_other_inf == "Yes" ~ "ctrl_flu", TB_diagnosis == "control"& NCR_current_other_inf == "No" ~ "ctrl", TB_diagnosis =="control" & is.na(NCR_current_other_inf) ~ "ctrl_unkwn_flu",  ncr_sr_tb_status == "No" & TB_diagnosis =="case" ~ "notctrl_other" , ncr_sr_tb_status == "Yes" & TB_diagnosis =="case" ~ NA ,is.na(tb_status) & TB_diagnosis =="case" ~ NA ,TRUE ~ TB_diagnosis)) %>% relocate(validated_control_status , .after = TB_diagnosis)%>% relocate("NCR_current_other_inf", .after = TB_diagnosis)
 
 
 final_tb_status_table <- left_join(final_control_assignments, final_case_key, by = "Participant.study.ID") %>% relocate("validated_case_status", .after = "validated_control_status") %>% mutate(FINAL_STATUS = case_when(is.na(validated_case_status) & is.na(validated_control_status) ~ "missing",is.na(validated_case_status) & !is.na(validated_control_status) ~ validated_control_status,!is.na(validated_case_status) & is.na(validated_control_status) ~ validated_case_status )) %>% relocate("FINAL_STATUS", .after = "validated_case_status")
 #include cases with flu
-final_tb_status_table2 <- final_tb_status_table %>% mutate(FINAL_STATUS = case_when(FINAL_STATUS == "2weekCasewithflu" ~ "2weekCase", TRUE ~ FINAL_STATUS))
+final_tb_status_table2 <- final_tb_status_table %>% mutate(FINAL_STATUS = case_when(FINAL_STATUS == "2weekCasewithflu" ~ "2weekCase", FINAL_STATUS =="2weekCaseunknwnflu" ~ "2weekCase",TRUE ~ FINAL_STATUS))
 
 final_counts <- table(final_tb_status_table$FINAL_STATUS)
 #view(final_counts)
@@ -208,7 +208,8 @@ final_counts <- table(final_tb_status_table$FINAL_STATUS)
 final_counts2 <- table(final_tb_status_table2$FINAL_STATUS)
 view(final_counts2)
 
-output_path <- "/Users/oshi/Library/CloudStorage/Dropbox/NCR Study"
+
+output_path <- "/Users/oshi/Library/CloudStorage/Dropbox/NCR Study" #EDITABLE
 
 #write.csv(final_tb_status_table2 , file.path(output_path, "final__tb_assignments.csv"), row.names = FALSE)
 

@@ -49,7 +49,7 @@ case_function <- function(TB_Diag_Date, tb_status, HIV_status, treatment_srt_dat
 }
 
 Validated_Cases <- raw_NCR_data_ %>%
-  mutate(case_status = case_function(TB_Diag_Date, tb_status, HIV_status, treatment_srt_date, lab_receive_date)) %>% filter(tb_status =="Yes") %>% mutate(validated_case_status = case_when(current_other_inf =="No" & case_status == "2weekCase" ~ "2weekCase", current_other_inf =="Yes" & case_status =="2weekCase"  ~ "2weekCaseunknwnflu", is.na(current_other_inf) & case_status =="2weekCase" ~ "2weekCaseunknwnflu", TRUE ~"notcase_other"))
+  mutate(case_status = case_function(TB_Diag_Date, tb_status, HIV_status, treatment_srt_date, lab_receive_date)) %>% filter(tb_status =="Yes") %>% mutate(validated_case_status = case_when(current_other_inf =="No" & case_status == "2weekCase" ~ "2weekCase", current_other_inf =="Yes" & case_status =="2weekCase"  ~ "2weekCasewithflu", is.na(current_other_inf) & case_status =="2weekCase" ~ "2weekCaseunknwnflu", TRUE ~"notcase_other"))
 
 final_case_key <- Validated_Cases %>% select(Participant.study.ID,validated_case_status)
 # Now Validated_Cases dataframe will have a new column called "val_cases" with the function results
@@ -63,16 +63,14 @@ colnames(count_table) <- c("Validated_Case_Status", "Count")
 print(count_table)
 #write_csv(Validated_Cases,"/Users/oshi/Desktop/TB/Validated_Cases.csv")
 
-
-
 #sanity check
 
 Validated_Cases2 <- raw_NCR_data_ %>%
   mutate(
-    subtraction1 = lab_receive_date - TB_Diag_Date,
-    subtraction2 = lab_receive_date - treatment_srt_date,
-    intermediate1 = lab_receive_date - TB_Diag_Date < 30,
+    lab_date_2_diag_date = lab_receive_date - TB_Diag_Date,
+    lab_date_2_trtment_strt = lab_receive_date - treatment_srt_date,
+    less_than_thirty = lab_receive_date - TB_Diag_Date < 30,
     intermediate2 = tb_status == "Yes",
     intermediate3 = HIV_status == "Negative",
     val_cases = case_function(TB_Diag_Date, tb_status, HIV_status, treatment_srt_date, lab_receive_date)
-  ) %>% select(Participant.study.ID, tb_status,HIV_status,treatment_srt_date,lab_receive_date,TB_Diag_Date,val_cases,subtraction1:val_cases)
+  ) %>% select(Participant.study.ID, tb_status,HIV_status,treatment_srt_date,lab_receive_date,TB_Diag_Date,val_cases,lab_date_2_diag_date:val_cases)
