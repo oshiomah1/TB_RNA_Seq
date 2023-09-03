@@ -28,8 +28,22 @@
 
 ### There are 2 options to run the scripts
 
-### 1) Investigator mode: First you can run case_decision_tree and control_decision_tree in any order, then updated data merge. You would do this when trying to find cracks in the system
+### 1) Quick'n'easy mode: Only Run updated_data_merge.R. This script actually automatically sources both decision tree scripts. You should get an output pop up on your rstudio with final case/control counts
 
-### 2) Quick'n'easy mode: Only Run updated_data_merge.R. This script actually automatically sources both decision tree scripts. You should get an output pop up on your rstudio with final case/control counts
+### 2) Investigator mode: First you can run case_decision_tree and control_decision_tree in any order, then updated data merge. You would do this when trying to find cracks in the system. 
+
+##### An important thing to track here is why some cases fall of the assignment tree. After running case_decision_tree , view(Validatedcases2) and check out these columns for individuals that have become notcase_other
+
+1.  lab_date_2\_diag_date = lab_receive_date - TB_Diag_Date,
+
+2.  lab_date_2\_trtment_strt = lab_receive_date - treatment_srt_date,
+
+3.  less_than_thirty = lab_receive_date - TB_Diag_Date \< 30,
+
+4.  intermediate2 = tb_status == "Yes",
+
+5.   intermediate3 = HIV_status == "Negative",
+
+### 
 
 *#to do: make another script from updated data_merge to check for missing demographic data*
