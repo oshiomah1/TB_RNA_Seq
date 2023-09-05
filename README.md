@@ -10,7 +10,7 @@
 
 #### \*\*raw_NCTB_data & raw_NCR_data
 
-# Before ruunning Scripts:
+# Before running Scripts:
 
 ## Before running, you must
 
