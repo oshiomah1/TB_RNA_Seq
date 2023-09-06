@@ -31,14 +31,11 @@ editor_options:
 
 # Control Decision Tree: 
 
--   This is a bit meatier than the control decision tree. It combs
-    through NCR database for contemporary info and NCTB for lifetime
+-   This combs through NCR database for contemporary info and NCTB for lifetime
     medical records
 
 -   Criteria: Adult patient, no TB symptoms, HIV negative, CANNOT have
     had a previous case of TB in their lifetime
-
--   Variables used: Key: Revised_name = Redcap Variable name
 
 -   It uses two functions; medical validator and self_report_validator
     for pre-assignments and then combines the two results into the final
@@ -62,7 +59,7 @@ editor_options:
 
     -    frst_pst_tb_test_date =
 
-    -   treat_reg_selec =
+    -   treat_reg_select = Treatment Regimen Selection
 
     -   cmpltd_trtmnt =
 
@@ -70,9 +67,11 @@ editor_options:
 
 #### **self_report_validator:** 
 
-Preliminary assignment as case, control or unknown using the following
-self report_variables: prior_tb_self_reported,
-prior_tb_n\_self_reported, frst_pst_tb_test_date
+Preliminary assigns individuals as case, control or unknown using the following
+self report_variables: 
+prior_tb_self_reported: Have you had TB in the past? (Self-reported)
+prior_tb_n_self_reported: How many prior TB episodes, self-reported
+rst_pst_tb_test_date: 
 
 #### validated_study_for_merge: 
 
@@ -86,6 +85,6 @@ only have medical data.
 The final control assignemnts are done in updated_merge.r. First the NCR
 and NCTB datasets are combined using saliva barcode, names and manual
 matches. Then controls are stratified into their flu status. Flu status
-isn't a criteria for assigning cases (but recorded nonthele3ss). In the
+isn't a criteria for assigning cases (but recorded nontheless). In the
 final output table, FINAL_STATUS records case-control definition,
 TB_Diagnosis is control_dec_tree, #insert nonsmear csv file to github
