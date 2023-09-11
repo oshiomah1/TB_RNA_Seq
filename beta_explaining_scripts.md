@@ -11,7 +11,7 @@ editor_options:
 -   Criteria: Adult patient, TB symptoms, less than 15 days of starting
     medication, less than 1 month between TB diagnosis date and lab
     receive date, HIV negative, patient can have flu or previous
-    episodes of TRB
+    episodes of TB
 
 -   Variables used:
 
@@ -79,11 +79,6 @@ self_report_validator to assign patients as case, control or unknown.
 This now accounts for situations where patients only have self report or
 only have medical data.
 
-# Updatedmerge.r:
+# generate_key.r:
 
-The final control assignemnts are done in updated_merge.r. First the NCR
-and NCTB datasets are combined using saliva barcode, names and manual
-matches. Then controls are stratified into their flu status. Flu status
-isn't a criteria for assigning cases (but recorded nontheless). In the
-final output table, FINAL_STATUS records case-control definition,
-TB_Diagnosis is control_dec_tree, #insert nonsmear csv file to github
+This script generates a an NCTB-NCR key. It uses a combination of fuzzy name matching, saliva barcodes and manual matching.
