@@ -4,15 +4,6 @@ editor_options:
     wrap: 72
 ---
 
-# generate_key.r:
-
-The final control assignments are done in updated_merge.r. First the NCR
-and NCTB datasets are combined using saliva barcode, names and manual
-matches. Then controls are stratified into their flu status. Flu status
-isn't a criteria for assigning cases (but recorded nontheless). In the
-final output table, FINAL_STATUS records case-control definition,
-TB_Diagnosis is control_dec_tree, #insert nonsmear csv file to github
-
 # **Case Decision Tree**
 
 -   Assigns cases from NCR_redcap database ONLY
@@ -20,7 +11,7 @@ TB_Diagnosis is control_dec_tree, #insert nonsmear csv file to github
 -   Criteria: Adult patient, TB symptoms, less than 15 days of starting
     medication, less than 1 month between TB diagnosis date and lab
     receive date, HIV negative, patient can have flu or previous
-    episodes of TRB
+    episodes of TB
 
 -   Variables used:
 
@@ -28,7 +19,7 @@ TB_Diagnosis is control_dec_tree, #insert nonsmear csv file to github
 
     -   current_other_inf="Do.you.currently.have.an.infection.such.as.a.cold.or.the.flu.....not.TB,
 
-    -   tb_status = "Do.you.currently.have.TB........",g
+    -   tb_status = "Do.you.currently.have.TB........",
 
     -   lab_receive_date = "Date.PBMC.received.in.the.Lab",
 
@@ -39,9 +30,6 @@ TB_Diagnosis is control_dec_tree, #insert nonsmear csv file to github
     -   TB_Diag_Date ="Date.of.TB.diagnosis."
 
 # Control Decision Tree:
-
-![Control Decision Tree
-Pipeline](images/Screenshot 2023-09-12 at 14.04.53.png)
 
 -   This combs through NCR database for contemporary info and NCTB for
     lifetime medical records
@@ -60,9 +48,16 @@ Pipeline](images/Screenshot 2023-09-12 at 14.04.53.png)
 
 -   tb_test_result = insert redcap definition
 
+-   *tb_nonsmear = composite variable that pre assigns case, control or
+    unknown. It is created from the file nonsmearkey.csv. This file was
+    created originally in 2021 manually with Justin, Brenna & Oshi.*
+    insert more background\*
+
 -   treat_or_drug = composite variable that assigns: yes, no, unknwn,
     based on if patient has received TB medication, antibiotic
     resistance etc. It uses the following NCTB variables:
+
+    -   frst_pst_tb_test_date =
 
     -   treat_reg_select = Treatment Regimen Selection
 
@@ -74,8 +69,8 @@ Pipeline](images/Screenshot 2023-09-12 at 14.04.53.png)
 
 Preliminary assigns individuals as case, control or unknown using the
 following self report_variables: prior_tb_self_reported: Have you had TB
-in the past? (Self-reported) prior_tb_n_self_reported: How many prior TB
-episodes, self-reported rst_pst_tb_test_date:
+in the past? (Self-reported) prior_tb_n\_self_reported: How many prior
+TB episodes, self-reported rst_pst_tb_test_date:
 
 #### validated_study_for_merge:
 
@@ -83,3 +78,7 @@ Combines The pre-assignments of medical_validator and
 self_report_validator to assign patients as case, control or unknown.
 This now accounts for situations where patients only have self report or
 only have medical data.
+
+# generate_key.r:
+
+This script generates a an NCTB-NCR key. It uses a combination of fuzzy name matching, saliva barcodes and manual matching.
