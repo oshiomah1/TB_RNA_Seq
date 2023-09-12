@@ -6,12 +6,11 @@ editor_options:
 
 # generate_key.r:
 
-The final control assignments are done in updated_merge.r. First the NCR
-and NCTB datasets are combined using saliva barcode, names and manual
-matches. Then controls are stratified into their flu status. Flu status
-isn't a criteria for assigning cases (but recorded nontheless). In the
-final output table, FINAL_STATUS records case-control definition,
-TB_Diagnosis is control_dec_tree, #insert nonsmear csv file to github
+This combines the NCR and NCTB datasets using saliva barcode, fuzzy name
+joining and manual matches. Then controls are stratified into their flu
+status. Flu status isn't a criteria for assigning cases (but recorded
+nontheless). In the final output table, FINAL_STATUS records
+case-control definition, TB_Diagnosis is control_dec_tree,
 
 # **Case Decision Tree**
 
@@ -41,7 +40,7 @@ TB_Diagnosis is control_dec_tree, #insert nonsmear csv file to github
 # Control Decision Tree:
 
 ![Control Decision Tree
-Pipeline](images/Screenshot 2023-09-12 at 14.04.53.png)
+Pipeline](images/Screenshot%202023-09-12%20at%2014.04.53.png)
 
 -   This combs through NCR database for contemporary info and NCTB for
     lifetime medical records
