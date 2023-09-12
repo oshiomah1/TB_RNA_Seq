@@ -1,24 +1,26 @@
-# TB_RNA_Seq: Merging Datasets + Decision Trees
+# TB_RNA_Seq: Merging Datasets + Assignment Trees
 
 ## There are three R scripts in this project
 
-#### case_decision_tree.R: Assigns individuals as cases or other based on initial self-report and clinical syptoms and verified with current medical data
+#### generate_key.R: It merges two Redcap Databases; the smaller RNA seq study (NCR Database) with the larger GWAS study (NCTB Database) using fuzzy name matching, saliva barcodes and manual matching. I
+
+#### case_decision_tree.R: Assigns individuals as cases or "other" based on clinical symptoms, initial self-report and verified with current medical data
 
 #### control_decision_tree.R :Assigns individuals as controls based on PRIOR medical records. Searches a wide range of variables for TB evidence in their lifetime.
 
-#### updated_data_merge.R: It merges the smaller RNA seq study with the larger GWAS study using fuzzy name matching, saliva barcodes and manual matching. It automatically calls case_decision_tree.R and control_decision_tree.R
+![Control Decision Tree](images/Screenshot 2023-09-12 at 14.04.53-01.png)
 
-#### \*\*raw_NCTB_data & raw_NCR_data
+Note that cases and control are assigned in separate scripts due to different criteria from different databases used for assignments
 
 # Before running Scripts:
 
 ## Before running, you must
 
-### 1) In each script manually check that the datafile is the most recent from REDCAP, if not redownload. The variables where you edit these are
+### 1) In each script manually check that the data file is the most recent from REDCAP, if not ***re-download***. The variables in the scripts where you edit these are:
 
-#### a) control_decision_tree.R : raw_NCTB_TB_test_vars
+#### a) control_decision_tree.R : raw_NCR_data
 
-#### b) updated_data_merge.R: raw_NCTB_data & raw_NCR_data
+#### b) generate_key.R: raw_NCTB_data & raw_NCR_data
 
 #### c) case_decision_tree.R: raw_NCR_data\_
 
@@ -28,15 +30,19 @@
 
 ### There are 2 options to run the scripts
 
-### 1) Quick'n'easy mode: Only Run updated_data_merge.R. This script actually automatically sources both decision tree scripts. You should get an output pop up on your rstudio with final case/control counts
+### The scripts are run in the folllowing order
 
-### 2) Investigator mode: First you can run case_decision_tree and control_decision_tree in any order, then updated data merge. You would do this when trying to find cracks in the system.
+Generate key - control_decision_tree /case_decision_tree - final_merge
 
-##### An important thing to track here is why some cases fall of the assignment tree. After running case_decision_tree , view(Validatedcases2) and check out these columns for individuals that have become notcase_other
+### 1) Quick'n'easy mode: Only Run updated_data_merge.R. This script  automatically sources all the other R scripts. You should get an output pop up on your rstudio with final case/control counts and also a larger merged table with the variables used to assign cases and controls
 
-1.  lab_date_2\_diag_date = lab_receive_date - TB_Diag_Date,
+### 2) Investigator mode: You would do this when trying to find cracks in the system like when patients violate any of the assignmet criteria and why. You can run case_decision_tree or control_decision_tree in any order. 
 
-2.  lab_date_2\_trtment_strt = lab_receive_date - treatment_srt_date,
+case_decision_tree : An important thing to track here is why some cases fall of the assignment tree. After running case_decision_tree , view(Validatedcases2) and check out these columns for individuals that have become notcase_other
+
+1.  lab_date_2_diag_date = lab_receive_date - TB_Diag_Date,
+
+2.  lab_date_2_trtment_strt = lab_receive_date - treatment_srt_date,
 
 3.  less_than_thirty = lab_receive_date - TB_Diag_Date \< 30,
 
@@ -44,6 +50,14 @@
 
 5.  intermediate3 = HIV_status == "Negative",
 
-### 
+#### control_decision_tree:  
+
+##### view(final_control_validated_tbl) 
+
+##### check notctrl_other and their corresponding val_sr and val_med_tb columns
+
+if val-sr is false view(self_report_validated2) and check prior_tb_self_reported, prior_n_tb_self_reported, frst_pst_tb_test_date
+
+if val_med_tb is false; check tb_test and treat_or_drug
 
 *#to do: make another script from updated data_merge to check for missing demographic data*
