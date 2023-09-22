@@ -1,3 +1,7 @@
+---
+---
+---
+
 # TB_RNA_Seq: Merging Datasets + Assignment Trees
 
 ## There are three R scripts in this project
@@ -8,7 +12,7 @@
 
 #### control_decision_tree.R :Assigns individuals as controls based on PRIOR medical records. Searches a wide range of variables for TB evidence in their lifetime.
 
-![Control Decision Tree](images/Screenshot 2023-09-12 at 14.04.53-01.png)
+![Control Decision Tree](images/ctrl_decision_tree.png)
 
 Note that cases and control are assigned in separate scripts due to different criteria from different databases used for assignments
 
@@ -32,13 +36,17 @@ Note that cases and control are assigned in separate scripts due to different cr
 
 ### The scripts are run in the folllowing order
 
-Generate key - control_decision_tree /case_decision_tree - final_merge
+Generate key -\> control_decision_tree \| case_decision_tree
 
-### 1) Quick'n'easy mode: Only Run updated_data_merge.R. This script  automatically sources all the other R scripts. You should get an output pop up on your rstudio with final case/control counts and also a larger merged table with the variables used to assign cases and controls
+1) If you just want the NCTB-NCR key: just run generate_key.r
 
-### 2) Investigator mode: You would do this when trying to find cracks in the system like when patients violate any of the assignmet criteria and why. You can run case_decision_tree or control_decision_tree in any order. 
+2) To get a list of validated case or controls run their respective decision tree. This automatically sources generate_key.r. . You should get an output pop up on your rstudio with final case/control counts and also a larger merged table with the variables used to assign cases and controls
 
-case_decision_tree : An important thing to track here is why some cases fall of the assignment tree. After running case_decision_tree , view(Validatedcases2) and check out these columns for individuals that have become notcase_other
+### 3) Investigator mode: You would do this when trying to find cracks in the system like when patients violate any of the assignment criteria and why. Remember You can run case_decision_tree or control_decision_tree in any order.
+
+After running case_decision_tree :
+
+-   view(Validatedcases2) and check out these columns for individuals that have become "notcase_other" :
 
 1.  lab_date_2_diag_date = lab_receive_date - TB_Diag_Date,
 
@@ -48,16 +56,22 @@ case_decision_tree : An important thing to track here is why some cases fall of 
 
 4.  intermediate2 = tb_status == "Yes",
 
-5.  intermediate3 = HIV_status == "Negative",
+5.  intermediate3 = HIV_status == "Negative"
 
-#### control_decision_tree:  
+    if any of these columns are False or \>15 or 30 then that provides the context
 
-##### view(final_control_validated_tbl) 
+#### control_decision_tree:
+
+##### view(final_control_validated_tbl)
 
 ##### check notctrl_other and their corresponding val_sr and val_med_tb columns
 
-if val-sr is false view(self_report_validated2) and check prior_tb_self_reported, prior_n_tb_self_reported, frst_pst_tb_test_date
+if val_sr is false:
 
-if val_med_tb is false; check tb_test and treat_or_drug
+-   view(self_report_validated2) and check prior_tb_self_reported, prior_n_tb_self_reported, frst_pst_tb_test_date
+
+if val_med_tb is false;
+
+-   check tb_test and treat_or_drug
 
 *#to do: make another script from updated data_merge to check for missing demographic data*
